@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
-void* create_shared_mem(const char* mapping_name, const int size) {
+void* create_shmem(const char* mapping_name, const int size) {
   int fd = open(mapping_name, O_CREAT | O_RDWR, S_IRWXU);
   if(fd == -1){
     perror("open failed");
@@ -27,20 +27,14 @@ void* create_shared_mem(const char* mapping_name, const int size) {
   return bm;
 }
 
-void* open_shared_mem(const char* mapping_name, const int size) {
-  int fd = open(mapping_name, O_RDWR, S_IRWXU);
-  if(fd == -1){
-    perror("open failed");
+void destroy_shmem(void* addr, const char* mapping_name, const int size) {
+  if(munmap(addr, size) == -1) {
+    perror("calling mummap failed");
     assert(NULL); 
   }
   
-  void* bm = mmap(NULL, size, PROT_EXEC | PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-  if(bm == MAP_FAILED) {
-    perror("calling mmap failed");
+  if(unlink(mapping_name) == -1) {
+    perror("calling unlink failed");
     assert(NULL); 
   }
-
-  close(fd);
-
-  return bm;
 }

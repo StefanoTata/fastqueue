@@ -1,22 +1,24 @@
-SRC = fastqueue.c shared_mem_utils.c
-
+CC = gcc
 CFLAG = -O2 -Wall -Wextra 
 CDEBUGFLAG = -g -O0 -Wall -Wextra
 LINKING_FLAGS = -lrt
 
-all_debug: fastqueue_debug producer_debug consumer_debug
+SRC = fastqueue.c utils.c
 
-fastqueue: $(SRC) test_fastqueue.c 
-	gcc $(CFLAG) test_fastqueue.c $(SRC) $(LINKING_FLAGS) -o test_fastqueue
+all: CC += $(CFLAG)
+all: queue producer consumer
 
-fastqueue_debug: $(SRC) test_fastqueue.c 
-	gcc $(CDEBUGFLAG) test_fastqueue.c $(SRC) $(LINKING_FLAGS) -o test_fastqueue
+debug: CC += $(CDEBUGFLAG)
+debug: queue producer consumer
 
-producer_debug: $(SRC) test_producer.c
-	gcc $(CDEBUGFLAG) test_producer.c $(SRC) $(LINKING_FLAGS) -o test_producer
+queue: $(SRC) queue.c 
+	$(CC) queue.c $(SRC) $(LINKING_FLAGS) -o queue
 
-consumer_debug: $(SRC) test_consumer.c
-	gcc $(CDEBUGFLAG) test_consumer.c $(SRC) $(LINKING_FLAGS) -o test_consumer
+producer: $(SRC) producer.c
+	$(CC) producer.c $(SRC) $(LINKING_FLAGS) -o producer
 
-clean: 
-	rm test_fastqueue test_producer test_consumer
+consumer: $(SRC) consumer.c
+	$(CC) consumer.c $(SRC) $(LINKING_FLAGS) -o consumer
+
+clean:
+	rm queue producer consumer
